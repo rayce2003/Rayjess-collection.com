@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Rayjes Collection</title>
+<style>
+  :root{
+    --brand:#b30059; --accent:#ffccdd; --whatsapp:#25D366; --muted:#666;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Arial,sans-serif;background:#faf8fb;color:#222;scroll-behavior:smooth}
+  /* header */
+  header{position:fixed;top:0;left:0;right:0;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;z-index:1200}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo img{width:44px;height:44px;border-radius:8px;object-fit:cover}
+  .logo h1{margin:0;font-size:1.05rem}
+  nav{display:flex;gap:10px;align-items:center}
+  nav a{color:#fff;text-decoration:none;padding:6px 8px;border-radius:6px;font-weight:600}
+  nav a:hover{background:rgba(255,255,255,0.06)}
+  .controls{display:flex;gap:10px;align-items:center}
+  .search input{padding:7px 10px;border-radius:8px;border:none;min-width:160px}
+  .cart-btn{position:relative;background:transparent;border:2px solid rgba(255,255,255,.12);color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700}
+  .cart-count{position:absolute;top:-8px;right:-8px;background:var(--whatsapp);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:0.78rem}
+  /* welcome full-screen */
+  .welcome-wrap{height:100vh;display:flex;align-items:center;justify-content:center;padding-top:56px;background:linear-gradient(0deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg') center/cover no-repeat;color:#fff;text-align:center}
+  .welcome-card{background:rgba(0,0,0,0.45);padding:24px;border-radius:12px;max-width:900px}
+  .welcome-card h2{margin:0 0 10px;font-size:2rem}
+  .dropdown{position:relative;display:inline-block}
+  .dropbtn{background:var(--accent);color:var(--brand);padding:10px 14px;border-radius:8px;border:none;font-weight:700;cursor:pointer}
+  .dropdown-content{display:none;position:absolute;background:#fff;min-width:220px;box-shadow:0 8px 20px rgba(0,0,0,.15);right:0;border-radius:8px;overflow:hidden}
+  .dropdown-content a{display:block;padding:10px 12px;color:#222;text-decoration:none;border-bottom:1px solid #f2f2f2}
+  .dropdown-content a:last-child{border-bottom:none}
+  .dropdown-content a:hover{background:#f7f7f7}
+  .btn-primary{background:var(--brand);color:#fff;padding:10px 14px;border-radius:8px;border:none;font-weight:700;cursor:pointer;margin-left:10px}
+  /* main layout */
+  main{padding-top:86px}
+  section{padding:48px 18px;max-width:1100px;margin:0 auto}
+  h2{color:var(--brand);margin-bottom:12px}
+  .intro{color:var(--muted);margin-bottom:6px}
+  /* featured slider */
+  .slider{position:relative;margin:12px 0;border-radius:12px;overflow:hidden}
+  .slides{display:flex;transition:transform .5s ease-in-out}
+  .slide{min-width:100%;height:360px;position:relative}
+  .slide img{width:100%;height:100%;object-fit:cover;display:block}
+  .caption{position:absolute;left:18px;bottom:18px;background:rgba(0,0,0,.55);color:#fff;padding:8px 12px;border-radius:8px}
+  .slider .nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);color:#fff;border:none;cursor:pointer}
+  .slider .prev{left:12px}.slider .next{right:12px}
+  /* product grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  .card{background:#fff;border-radius:12px;padding:12px;border:1px solid #eee;box-shadow:0 10px 24px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:10px}
+  .card img{width:100%;height:220px;object-fit:cover;border-radius:10px;cursor:pointer}
+  .card h3{margin:0;color:var(--brand);font-size:1.05rem}
+  .card p{margin:0;color:var(--muted)}
+  .actions{display:flex;gap:8px;align-items:center}
+  .add{background:var(--brand);color:#fff;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  .buy{background:var(--whatsapp);color:#fff;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  .save{background:#eee;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  /* dress list (one per line) */
+  .dress-list{display:flex;flex-direction:column;gap:12px}
+  .dress-row{display:flex;gap:12px;align-items:center;background:#fff;padding:12px;border-radius:10px;border:1px solid #eee}
+  .dress-row img{width:160px;height:120px;object-fit:cover;border-radius:8px}
+  .meta{flex:1}
+  .meta h4{margin:0;color:var(--brand)}
+  .meta p{margin:6px 0;color:var(--muted)}
+  /* cart popup */
+  .cart-popup{position:fixed;right:18px;top:72px;width:380px;max-width:92vw;background:#fff;border-radius:12px;padding:12px;box-shadow:0 12px 30px rgba(0,0,0,.2);z-index:1600;display:none;flex-direction:column;gap:10px;max-height:80vh;overflow:auto}
+  .cart-popup.show{display:flex}
+  .cart-item{display:flex;gap:8px;align-items:center;border-bottom:1px solid #f0f0f0;padding:8px 0}
+  .cart-item img{width:64px;height:64px;object-fit:cover;border-radius:8px}
+  .cart-item .meta{flex:1}
+  .qty-controls{display:flex;gap:6px;align-items:center}
+  .small{padding:6px 8px;border-radius:8px;background:#eee;border:none;cursor:pointer}
+  .remove{background:#ff6b6b;color:#fff;border:none;padding:6px 8px;border-radius:8px;cursor:pointer}
+  /* account modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1700}
+  .modal.show{display:flex}
+  .panel{background:#fff;padding:18px;border-radius:12px;max-width:480px;width:100%}
+  .row{margin-bottom:10px;display:flex;flex-direction:column;gap:6px}
+  input[type="text"],input[type="email"],input[type="password"],select{padding:8px;border-radius:8px;border:1px solid #ddd;width:100%}
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tabs button{padding:8px 12px;border-radius:8px;border:none;background:#f4f4f4;cursor:pointer}
+  .tabs button.active{background:var(--brand);color:#fff}
+  /* return policy */
+  .policy{background:#fff;padding:16px;border-radius:10px;border:1px solid #eee}
+  /* footer */
+  footer{background:#111;color:#fff;text-align:center;padding:18px;margin-top:20px}
+  /* floating whatsapp */
+  .wa-float{position:fixed;right:16px;bottom:88px;background:var(--whatsapp);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.2);z-index:1600}
+  .top-btn{position:fixed;right:16px;bottom:16px;background:var(--brand);color:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1600}
+  @media(max-width:760px){.welcome-wrap{padding:80px 18px}.card img{height:160px}.slide{height:200px}.slides{height:200px}}
+</style>
+</head>
+<body>
+
+<!-- header -->
+<header>
+  <div class="logo">
+    <img src="https://via.placeholder.com/64x64.png?text=R" alt="Rayjes logo">
+    <div>
+      <h1>Rayjes Collection</h1>
+      <div style="font-size:12px;color:rgba(255,230,240,0.9)">Bamburi, Mombasa • Mon–Sat 8:00–20:00</div>
+    </div>
+  </div>
+
+  <nav>
+    <a href="#featured">Home</a>
+    <a href="#about">About</a>
+    <a href="#dresses">Dresses</a>
+    <a href="#shoes">Shoes</a>
+    <a href="#handbags">Handbags</a>
+    <a href="#trousers">Trousers</a>
+    <a href="#shirts">Shirts</a>
+    <a href="#returns">Returns</a>
+    <a href="#reviews">Reviews</a>
+  </nav>
+
+  <div class="controls">
+    <div class="search"><input id="search" placeholder="Search products..."></div>
+    <button id="accountBtn" class="btn" style="background:#fff;color:var(--brand);padding:8px 12px;border-radius:8px;font-weight:700">Account</button>
+    <button id="cartToggle" class="cart-btn" aria-label="Open cart">Cart <span id="cartCount" class="cart-count">0</span></button>
+  </div>
+</header>
+
+<!-- Welcome / Home hero -->
+<div class="welcome-wrap" id="welcome">
+  <div class="welcome-card">
+    <h2>Welcome to Rayjes Collection</h2>
+    <p style="color:#ffd6ea">Trendy ladies' clothes, shoes and handbags — Bamburi, Mombasa</p>
+
+    <div style="margin-top:14px">
+      <div class="dropdown" style="display:inline-block">
+        <button class="dropbtn">Shop Categories ▾</button>
+        <div class="dropdown-content" id="welcomeDropdown">
+          <a href="#dresses" data-cat="dresses">Dresses (sundress, cocktail...)</a>
+          <a href="#shoes" data-cat="shoes">Shoes (heels, flats, closed)</a>
+          <a href="#handbags" data-cat="handbags">Handbags</a>
+          <a href="#trousers" data-cat="trousers">Trousers</a>
+          <a href="#shirts" data-cat="shirts">Shirts & Tops</a>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="toAbout">About Rayjes</button>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- Featured slider -->
+  <section id="featured">
+    <h2>Featured</h2>
+    <div class="slider" aria-hidden="false">
+      <div class="slides">
+        <div class="slide"><img src="https://images.pexels.com/photos/1488463/pexels-photo-1488463.jpeg" alt="Dinner Dress"><div class="caption">Dinner Dress — KSh 2,500</div></div>
+        <div class="slide"><img src="https://images.pexels.com/photos/267320/pexels-photo-267320.jpeg" alt="Heels"><div class="caption">Stylish Heels — KSh 1,500</div></div>
+        <div class="slide"><img src="https://images.pexels.com/photos/298864/pexels-photo-298864.jpeg" alt="Handbag"><div class="caption">Trendy Handbag — From KSh 1,000</div></div>
+      </div>
+      <button class="nav prev" aria-label="Prev">‹</button>
+      <button class="nav next" aria-label="Next">›</button>
+    </div>
+    <p class="intro">Click a category in the dropdown or use the navigation to browse items. Click images to enlarge, save items for later or add them to your cart.</p>
+  </section>
+
+  <!-- ABOUT (landing from welcome) -->
+  <section id="about">
+    <h2>About Rayjes Collection</h2>
+    <p class="intro">Located in Bamburi, Mombasa, Rayjes Collection brings elegant, affordable and trendy ladies' wear to our community. We focus on great service and quality.</p>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:12px">
+      <div style="flex:1;min-width:260px">
+        <h4>Mission</h4>
+        <p>At Rayjes Collection we believe every woman deserves elegance, style and affordability — delivered with heart and excellent customer service.</p>
+      </div>
+      <div style="flex:1;min-width:260px">
+        <h4>Contact</h4>
+        <p>📍 Bamburi, Mombasa<br>📞 <a href="tel:0740449369">0740449369</a><br>Instagram & Facebook: @rayjescollection</p>
+      </div>
+      <div style="flex:1;min-width:260px">
+        <h4>Opening Hours</h4>
+        <p>Monday – Saturday: 8:00 AM – 8:00 PM</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DRESSES -->
+  <section id="dresses">
+    <h2>Dresses</h2>
+    <div class="dress-list">
+      <!-- each dress-item is also .product for search/wishlist/cart handling -->
+      <div class="dress-row card product" data-name="Sundress" data-price="1200">
+        <img src="https://images.pexels.com/photos/5886045/pexels-photo-5886045.jpeg" alt="Sundresses on hanger">
+        <div class="meta">
+          <h4>Sundresses</h4>
+          <p>Light, breezy sundresses — Price range: KSh 1,000 – 2,000</p>
+          <div class="actions">
+            <button class="add" data-name="Sundress" data-price="1200">Add to Cart</button>
+            <button class="buy" data-name="Sundress">Buy Now</button>
+            <button class="save" data-name="Sundress">Save Item</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dress-row card product" data-name="Cocktail Dress" data-price="2800">
+        <img src="https://images.pexels.com/photos/2036646/pexels-photo-2036646.jpeg" alt="Cocktail dresses">
+        <div class="meta">
+          <h4>Cocktail Dresses</h4>
+          <p>Chic evening styles — Price range: KSh 2,500 – 5,000</p>
+          <div class="actions"><button class="add" data-name="Cocktail Dress" data-price="2800">Add to Cart</button><button class="buy" data-name="Cocktail Dress">Buy Now</button><button class="save" data-name="Cocktail Dress">Save Item</button></div>
+        </div>
+      </div>
+
+      <div class="dress-row card product" data-name="Official Dress" data-price="2000">
+        <img src="https://images.pexels.com/photos/7679728/pexels-photo-7679728.jpeg" alt="Official dresses">
+        <div class="meta">
+          <h4>Official Dresses</h4>
+          <p>Smart office & formal dresses — Price range: KSh 1,800 – 3,500</p>
+          <div class="actions"><button class="add" data-name="Official Dress" data-price="2000">Add to Cart</button><button class="buy" data-name="Official Dress">Buy Now</button><button class="save" data-name="Official Dress">Save Item</button></div>
+        </div>
+      </div>
+
+      <div class="dress-row card product" data-name="Dinner Dress" data-price="2500">
+        <img src="https://images.pexels.com/photos/6311394/pexels-photo-6311394.jpeg" alt="Dinner dresses">
+        <div class="meta">
+          <h4>Dinner Dresses</h4>
+          <p>Elegant formal gowns — Price range: KSh 2,500 – 5,000</p>
+          <div class="actions"><button class="add" data-name="Dinner Dress" data-price="2500">Add to Cart</button><button class="buy" data-name="Dinner Dress">Buy Now</button><button class="save" data-name="Dinner Dress">Save Item</button></div>
+        </div>
+      </div>
+
+      <div class="dress-row card product" data-name="Maxi Dress" data-price="2200">
+        <img src="https://images.pexels.com/photos/4210857/pexels-photo-4210857.jpeg" alt="Maxi dresses">
+        <div class="meta">
+          <h4>Maxi Dresses</h4>
+          <p>Flowy maxi styles — Price range: KSh 1,700 – 3,500</p>
+          <div class="actions"><button class="add" data-name="Maxi Dress" data-price="2200">Add to Cart</button><button class="buy" data-name="Maxi Dress">Buy Now</button><button class="save" data-name="Maxi Dress">Save Item</button></div>
+        </div>
+      </div>
+
+      <div class="dress-row card product" data-name="Off-the-Shoulder Dress" data-price="2100">
+        <img src="https://images.pexels.com/photos/4937225/pexels-photo-4937225.jpeg" alt="Off shoulder dresses">
+        <div class="meta">
+          <h4>Off-the-Shoulder Dresses</h4>
+          <p>Trendy off-the-shoulder — Price range: KSh 1,500 – 3,000</p>
+          <div class="actions"><button class="add" data-name="Off-the-Shoulder Dress" data-price="2100">Add to Cart</button><button class="buy" data-name="Off-the-Shoulder Dress">Buy Now</button><button class="save" data-name="Off-the-Shoulder Dress">Save Item</button></div>
+        </div>
+      </div>
+
+      <div class="dress-row card product" data-name="Long Sleeve Dress" data-price="2300">
+        <img src="https://images.pexels.com/photos/5709663/pexels-photo-5709663.jpeg" alt="Long sleeve dresses">
+        <div class="meta">
+          <h4>Long Sleeve Dresses</h4>
+          <p>Stylish long sleeve options — Price range: KSh 1,800 – 3,200</p>
+          <div class="actions"><button class="add" data-name="Long Sleeve Dress" data-price="2300">Add to Cart</button><button class="buy" data-name="Long Sleeve Dress">Buy Now</button><button class="save" data-name="Long Sleeve Dress">Save Item</button></div>
+        </div>
+      </div>
+
+      <div class="dress-row card product" data-name="Sweater Dress" data-price="1700">
+        <img src="https://images.pexels.com/photos/6311375/pexels-photo-6311375.jpeg" alt="Sweater dresses">
+        <div class="meta">
+          <h4>Sweater Dresses</h4>
+          <p>Cozy sweater dresses — Price range: KSh 1,200 – 2,500</p>
+          <div class="actions"><button class="add" data-name="Sweater Dress" data-price="1700">Add to Cart</button><button class="buy" data-name="Sweater Dress">Buy Now</button><button class="save" data-name="Sweater Dress">Save Item</button></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SHOES -->
+  <section id="shoes">
+    <h2>Shoes</h2>
+    <div class="grid">
+      <div class="card product" data-name="Heels" data-price="2200">
+        <img src="https://images.pexels.com/photos/267320/pexels-photo-267320.jpeg" alt="Heels">
+        <h3>Heels (2–8 in)</h3><p class="muted">KSh 2,200</p>
+        <div class="actions">
+          <button class="add" data-name="Heels" data-price="2200">Add to Cart</button>
+          <button class="buy" data-name="Heels">Buy Now</button>
+          <button class="save" data-name="Heels">Save Item</button>
+        </div>
+      </div>
+
+      <div class="card product" data-name="Wedges" data-price="1800">
+        <img src="https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg" alt="Wedges">
+        <h3>Wedges</h3><p class="muted">KSh 1,800</p>
+        <div class="actions"><button class="add" data-name="Wedges" data-price="1800">Add to Cart</button><button class="buy" data-name="Wedges">Buy Now</button><button class="save" data-name="Wedges">Save Item</button></div>
+      </div>
+
+      <div class="card product" data-name="Flat Shoes" data-price="300">
+        <img src="https://images.pexels.com/photos/7098287/pexels-photo-7098287.jpeg" alt="Flats">
+        <h3>Flat Shoes</h3><p class="muted">From KSh 300 — Sizes 35–42</p>
+        <div class="actions"><button class="add" data-name="Flat Shoes" data-price="300">Add to Cart</button><button class="buy" data-name="Flat Shoes">Buy Now</button><button class="save" data-name="Flat Shoes">Save Item</button></div>
+      </div>
+
+      <!-- Closed Shoes with models + colors + sizes -->
+      <div class="card product" data-name="Closed Shoes Collection" data-price="3200">
+        <img src="https://images.pexels.com/photos/7691237/pexels-photo-7691237.jpeg" alt="Closed Shoes">
+        <h3>Closed Shoes — Air Force / Bape Star / Air Max / Canvas</h3>
+        <p class="muted">Available colors: Blue, Pink, Black, White • Sizes: 35–42</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+          <!-- create color+model sample buttons (these simply show details) -->
+          <button class="save" data-name="Air Force (Black)" data-price="3200">Air Force - Black</button>
+          <button class="save" data-name="Air Force (White)" data-price="3200">Air Force - White</button>
+          <button class="save" data-name="Bape Star (Blue)" data-price="3200">Bape Star - Blue</button>
+          <button class="save" data-name="Air Max (Pink)" data-price="3200">Air Max - Pink</button>
+        </div>
+        <div style="margin-top:8px" class="actions"><button class="add" data-name="Closed Shoes" data-price="3200">Add to Cart</button><button class="buy" data-name="Closed Shoes">Buy Now</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HANDBAGS -->
+  <section id="handbags">
+    <h2>Handbags</h2>
+    <div class="grid">
+      <div class="card product" data-name="Handbag (From 1000)" data-price="1000">
+        <img src="https://images.pexels.com/photos/1342609/pexels-photo-1342609.jpeg" alt="Handbag shelf">
+        <h3>Handbags</h3>
+        <p class="muted">From KSh 1,000 — stylish shelves display</p>
+        <div class="actions"><button class="add" data-name="Handbag (From 1000)" data-price="1000">Add to Cart</button><button class="buy" data-name="Handbag (From 1000)">Buy Now</button><button class="save" data-name="Handbag (From 1000)">Save Item</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TROUSERS -->
+  <section id="trousers">
+    <h2>Trousers</h2>
+    <div class="grid">
+      <div class="card product" data-name="Official Trousers" data-price="1800">
+        <img src="https://images.pexels.com/photos/6311604/pexels-photo-6311604.jpeg" alt="Official trousers">
+        <h3>Official Trousers</h3><p class="muted">Sizes: 26–34 • Price: KSh 1,000 – 3,000 (new)</p>
+        <div class="actions"><button class="add" data-name="Official Trousers" data-price="1800">Add to Cart</button><button class="buy" data-name="Official Trousers">Buy Now</button><button class="save" data-name="Official Trousers">Save Item</button></div>
+      </div>
+
+      <div class="card product" data-name="Jeans Trousers" data-price="1500">
+        <img src="https://images.pexels.com/photos/1035610/pexels-photo-1035610.jpeg" alt="Jeans">
+        <h3>Jeans</h3><p class="muted">Sizes: 26–34 • New: KSh 1,000–3,000 • 2nd-hand: KSh 400–1,000</p>
+        <div class="actions"><button class="add" data-name="Jeans Trousers" data-price="1500">Add to Cart</button><button class="buy" data-name="Jeans Trousers">Buy Now</button><button class="save" data-name="Jeans Trousers">Save Item</button></div>
+      </div>
+
+      <div class="card product" data-name="Palazzo (New)" data-price="1700">
+        <img src="https://images.pexels.com/photos/977696/pexels-photo-977696.jpeg" alt="Palazzo">
+        <h3>Palazzo</h3><p class="muted">Sizes 26–34 • New: KSh 1,700 • 2nd-hand: KSh 400–1,000</p>
+        <div class="actions"><button class="add" data-name="Palazzo (New)" data-price="1700">Add to Cart</button><button class="buy" data-name="Palazzo (New)">Buy Now</button><button class="save" data-name="Palazzo (New)">Save Item</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHIRTS -->
+  <section id="shirts">
+    <h2>Shirts & Tops</h2>
+    <div class="grid">
+      <div class="card product" data-name="T-shirt" data-price="900">
+        <img src="https://images.pexels.com/photos/1002643/pexels-photo-1002643.jpeg" alt="Tshirt">
+        <h3>T-shirts</h3><p class="muted">Sizes: Small, Medium, Large — KSh 800–1,200</p>
+        <div class="actions"><button class="add" data-name="T-shirt" data-price="900">Add to Cart</button><button class="buy" data-name="T-shirt">Buy Now</button><button class="save" data-name="T-shirt">Save Item</button></div>
+      </div>
+
+      <div class="card product" data-name="Official Shirt" data-price="1800">
+        <img src="https://images.pexels.com/photos/5480696/pexels-photo-5480696.jpeg" alt="Official shirt">
+        <h3>Official Shirts</h3><p class="muted">Sizes: S / M / L — KSh 1,500–3,000</p>
+        <div class="actions"><button class="add" data-name="Official Shirt" data-price="1800">Add to Cart</button><button class="buy" data-name="Official Shirt">Buy Now</button><button class="save" data-name="Official Shirt">Save Item</button></div>
+      </div>
+
+      <div class="card product" data-name="Crop Top" data-price="1100">
+        <img src="https://images.pexels.com/photos/7691117/pexels-photo-7691117.jpeg" alt="Crop top">
+        <h3>Crop Tops</h3><p class="muted">Sizes: S / M / L — KSh 1,000–1,500</p>
+        <div class="actions"><button class="add" data-name="Crop Top" data-price="1100">Add to Cart</button><button class="buy" data-name="Crop Top">Buy Now</button><button class="save" data-name="Crop Top">Save Item</button></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DELIVERY -->
+  <section id="delivery">
+    <h2>Delivery</h2>
+    <div class="policy">
+      <p>We deliver across Kenya — Mombasa, Nairobi, Kisumu, Eldoret, Nakuru and more. Delivery charges depend on location and order size. Click Arrange Delivery to message us on WhatsApp for a delivery quote.</p>
+      <div style="margin-top:8px"><a class="buy" href="https://wa.me/254740449369?text=Please%20provide%20delivery%20details%20and%20costs" target="_blank">Arrange Delivery</a></div>
+    </div>
+  </section>
+
+  <!-- RETURNS / RETURN POLICY -->
+  <section id="returns">
+    <h2>Return Policy</h2>
+    <div class="policy">
+      <p>Return items within <strong>3 days</strong> of receiving your order. Items must be in original condition, unworn, with tags attached. Contact us via WhatsApp (0740 449 369) to arrange a return and refund or exchange.</p>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section id="reviews">
+    <h2>Customer Reviews</h2>
+    <p>See what our customers say — (Elfsight widget placeholder)</p>
+    <script src="https://apps.elfsight.com/p/platform.js" defer></script>
+    <div class="elfsight-app-XXXXXXX"></div>
+    <p style="margin-top:10px"><a href="YOUR_GOOGLE_REVIEW_LINK" target="_blank">Leave a Google Review</a></p>
+  </section>
+
+  <!-- ACCOUNT / ORDERS / SAVED items -->
+  <section id="accountSection">
+    <h2>Your Account (Local demo)</h2>
+    <p class="intro">Register or login to save items, view order history, and manage your saved items. Accounts and data are stored in your browser's localStorage.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button id="openAccount" class="add">Open Account / Login</button>
+      <button id="viewSaved" class="save">View Saved Items</button>
+      <button id="viewOrders" class="save">View Order History</button>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>📍 Bamburi, Mombasa</p>
+    <p>📞 <a href="tel:0740449369">0740449369</a></p>
+    <p>🕒 Mon–Sat, 8:00 AM – 8:00 PM</p>
+    <p>Facebook & Instagram: <strong>@rayjescollection</strong></p>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <small>© 2025 Rayjes Collection — All rights reserved</small>
+</footer>
+
+<!-- Floating WhatsApp -->
+<a class="wa-float" href="https://wa.me/254740449369?text=Hello%20Rayjes%20Collection%2C%20I%20have%20a%20question." target="_blank" title="Chat on WhatsApp" aria-label="Chat on WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M20.52 3.478A11.917 11.917 0 0012.005 0C5.373 0 .035 5.336.035 11.97c0 2.116.558 4.18 1.616 6.005L0 24l6.219-1.627A11.95 11.95 0 0012.005 24c6.631 0 11.97-5.334 11.97-11.98 0-3.204-1.25-6.204-3.455-8.542zM12.005 21.46c-1.797 0-3.49-.47-4.98-1.36l-.356-.204-3.69.966.99-3.6-.233-.372A8.6 8.6 0 013.375 12c0-4.78 3.9-8.68 8.63-8.68 4.73 0 8.63 3.9 8.63 8.68 0 4.78-3.9 8.68-8.63 8.68zM17.1 14.56c-.27-.14-1.6-.79-1.84-.88-.24-.09-.42-.14-.6.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.6.07-.27-.14-1.15-.42-2.19-1.35-.81-.72-1.36-1.6-1.52-1.87-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.04-.33-.02-.46-.06-.12-.6-1.45-.82-1.99-.21-.52-.42-.45-.6-.46l-.51-.01c-.18 0-.46.07-.7.33-.25.27-.95.93-.95 2.27 0 1.34.97 2.63 1.1 2.81.14.18 1.9 2.9 4.63 3.95 3.24 1.24 3.24.83 3.82.78.58-.05 1.88-.77 2.14-1.52.26-.75.26-1.39.18-1.52-.08-.13-.27-.18-.57-.32z"/></svg>
+</a>
+
+<button id="topBtn" class="top-btn" title="Back to top">↑</button>
+
+<!-- cart popup -->
+<div id="cartPopup" class="cart-popup" aria-hidden="true">
+  <h3 style="margin:0;color:var(--brand)">Your Cart</h3>
+  <div id="cartItems"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px">
+    <strong>Total:</strong><strong id="cartTotal">KSh 0</strong>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:space-between;margin-top:8px">
+    <button id="clearCart" class="small">Clear</button>
+    <button id="checkoutBtn" class="add" style="background:var(--whatsapp);">Checkout on WhatsApp</button>
+  </div>
+</div>
+
+<!-- Account modal -->
+<div id="accountModal" class="modal" aria-hidden="true">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">Account</h3>
+      <button id="closeAccount" style="background:#eee;border:none;padding:6px 8px;border-radius:8px;cursor:pointer">Close</button>
+    </div>
+
+    <div class="tabs" style="margin-top:12px">
+      <button id="tabLogin" class="active">Login</button>
+      <button id="tabRegister">Register</button>
+    </div>
+
+    <div id="loginPanel">
+      <div class="row"><label>Email</label><input id="loginEmail" type="email"></div>
+      <div class="row"><label>Password</label><input id="loginPass" type="password"></div>
+      <div style="display:flex;gap:8px">
+        <button id="doLogin" class="add">Login</button>
+        <button id="guestBtn" class="save">Continue as Guest</button>
+      </div>
+      <hr>
+      <h4>Saved Items (Quick View)</h4>
+      <div id="quickSaved"></div>
+    </div>
+
+    <div id="registerPanel" style="display:none">
+      <div class="row"><label>Full name</label><input id="regName" type="text"></div>
+      <div class="row"><label>Email</label><input id="regEmail" type="email"></div>
+      <div class="row"><label>Password</label><input id="regPass" type="password"></div>
+      <div style="display:flex;gap:8px">
+        <button id="doRegister" class="add">Register</button>
+      </div>
+    </div>
+
+    <hr>
+    <div>
+      <button id="viewOrdersBtn" class="save">View My Orders</button>
+      <button id="viewSavedBtn" class="save">View My Saved Items</button>
+      <div style="margin-top:8px;color:var(--muted);font-size:13px">Accounts are stored locally in your browser (localStorage).</div>
+    </div>
+  </div>
+</div>
+
+<!-- Orders modal -->
+<div id="ordersModal" class="modal" aria-hidden="true">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">Order History</h3>
+      <button id="closeOrders" style="background:#eee;border:none;padding:6px 8px;border-radius:8px;cursor:pointer">Close</button>
+    </div>
+    <div id="ordersList" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- Saved items modal -->
+<div id="savedModal" class="modal" aria-hidden="true">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">Saved Items</h3>
+      <button id="closeSaved" style="background:#eee;border:none;padding:6px 8px;border-radius:8px;cursor:pointer">Close</button>
+    </div>
+    <div id="savedList" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+/* -------------------------
+  Utility + initial data
+---------------------------*/
+const PHONE = '254740449369';
+function currency(n){ return 'KSh ' + Number(n).toLocaleString('en-KE'); }
+function el(q){ return document.querySelector(q) }
+function each(sel,fn){ document.querySelectorAll(sel).forEach(fn) }
+
+/* -------------------------
+  Dropdown: show/hide
+---------------------------*/
+const dropdownBtn = document.querySelector('.dropbtn');
+const dropdownContent = document.getElementById('welcomeDropdown');
+dropdownBtn.addEventListener('click', ()=> {
+  dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+});
+document.addEventListener('click', e => {
+  if(!e.target.closest('.dropdown')) dropdownContent.style.display = 'none';
+});
+
+/* jump from dropdown items to sections */
+each('#welcomeDropdown a', a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const href = a.getAttribute('href');
+    window.location.href = href;
+  });
+});
+
+/* welcome -> about button */
+document.getElementById('toAbout').addEventListener('click', ()=> {
+  window.location.hash = '#about';
+  window.scrollTo({top: document.getElementById('about').offsetTop - 70, behavior:'smooth'});
+});
+
+/* slider */
+(function slider(){
+  let idx=0;
+  const slides = document.querySelector('.slides');
+  const total = document.querySelectorAll('.slide').length;
+  function show(n){ idx = (n+total)%total; slides.style.transform = `translateX(${-idx*100}%)`; }
+  el('.next').addEventListener('click', ()=> show(idx+1));
+  el('.prev').addEventListener('click', ()=> show(idx-1));
+  setInterval(()=> show(idx+1),5000);
+})();
+
+/* lightbox on images */
+const lightbox = el('#lightbox');
+const lightboxImg = lightbox && lightbox.querySelector('img');
+each('.card img, .dress-row img', img => {
+  img.addEventListener('click', ()=> {
+    const lb = el('#lightbox'); if(!lb) return;
+    lb.querySelector('img').src = img.src;
+    lb.classList.add('show');
+    lb.setAttribute('aria-hidden','false');
+  });
+});
+if(el('#lightbox')) el('#lightbox').addEventListener('click', ()=> {
+  el('#lightbox').classList.remove('show'); el('#lightbox').setAttribute('aria-hidden','true');
+});
+
+/* -------------------------
+  Cart (in-memory, persisted optional)
+---------------------------*/
+let cart = {}; // {name:{price,qty,img}}
+const cartToggle = el('#cartToggle'), cartPopup = el('#cartPopup'), cartItemsEl = el('#cartItems'), cartTotalEl = el('#cartTotal'), cartCount = el('#cartCount');
+
+function renderCart(){
+  cartItemsEl.innerHTML = '';
+  let total = 0, count=0;
+  for(const name in cart){
+    const it = cart[name];
+    total += it.price*it.qty; count += it.qty;
+    const div = document.createElement('div'); div.className='cart-item';
+    div.innerHTML = `<img src="${it.img||''}" alt=""><div class="meta"><div style="font-weight:700">${name}</div><div style="color:var(--muted);font-size:13px">${currency(it.price)} x ${it.qty} = <strong>${currency(it.price*it.qty)}</strong></div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <div class="qty-controls"><button class="small" data-act="dec" data-name="${encodeURIComponent(name)}">-</button><div style="padding:0 8px">${it.qty}</div><button class="small" data-act="inc" data-name="${encodeURIComponent(name)}">+</button></div>
+        <button class="remove" data-act="remove" data-name="${encodeURIComponent(name)}">Remove</button>
+      </div>`;
+    cartItemsEl.appendChild(div);
+  }
+  cartTotalEl.textContent = currency(total);
+  cartCount.textContent = count;
+}
+
+/* attach add-to-cart buttons */
+each('.add', btn => {
+  btn.addEventListener('click', e => {
+    const name = btn.getAttribute('data-name');
+    const price = Number(btn.getAttribute('data-price') || 0);
+    const card = btn.closest('.card') || btn.closest('.dress-row');
+    const img = card ? (card.querySelector('img') && card.querySelector('img').src) : '';
+    if(!cart[name]) cart[name] = {price, qty:0, img};
+    cart[name].qty += 1;
+    renderCart();
+  });
+});
+
+/* buy now -> open whatsapp for single item (also record order if logged in) */
+each('.buy', b => b.addEventListener('click', e => {
+  const name = b.getAttribute('data-name'), price = Number(b.getAttribute('data-price') || 0);
+  const msg = `Hello Rayjes Collection, I want to order: ${name} — Price: ${currency(price)}`;
+  window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+}));
+
+/* cart popup controls (delegation) */
+cartPopup.addEventListener('click', e => {
+  const act = e.target.getAttribute('data-act');
+  const nameEnc = e.target.getAttribute('data-name');
+  if(!act || !nameEnc) return;
+  const name = decodeURIComponent(nameEnc);
+  if(act === 'inc') cart[name].qty += 1;
+  if(act === 'dec') cart[name].qty = Math.max(1, cart[name].qty -1);
+  if(act === 'remove') delete cart[name];
+  renderCart();
+});
+
+/* toggle cart */
+cartToggle.addEventListener('click', ()=> {
+  cartPopup.classList.toggle('show');
+  cartPopup.setAttribute('aria-hidden', cartPopup.classList.contains('show') ? 'false' : 'true');
+  renderCart();
+});
+el('#clearCart').addEventListener('click', ()=> { cart = {}; renderCart(); });
+
+/* checkout: build message with items + total; save order to localStorage under current user or guest */
+function cartToWhatsAppAndSave(){
+  const items = Object.entries(cart);
+  if(items.length === 0){ alert('Your cart is empty'); return; }
+  let lines = ["Hello Rayjes Collection, I'd like to order:"];
+  let total=0;
+  items.forEach(([name,it]) => { lines.push(`- ${name} (${it.qty} x ${currency(it.price)})`); total += it.qty * it.price; });
+  lines.push(`Total: ${currency(total)}`);
+  const msg = encodeURIComponent(lines.join('\n'));
+  // save order to localStorage for logged-in user
+  const current = localStorage.getItem('rc_current_user');
+  const order = {items: items.map(([n,it])=>({name:n,price:it.price,qty:it.qty})), total, date: new Date().toISOString()};
+  if(current){
+    const users = JSON.parse(localStorage.getItem('rc_users')||'{}');
+    if(users[current]){ users[current].orders = users[current].orders || []; users[current].orders.push(order); localStorage.setItem('rc_users', JSON.stringify(users)); }
+  } else {
+    // store in guest orders array
+    const guestOrders = JSON.parse(localStorage.getItem('rc_guest_orders')||'[]'); guestOrders.push(order); localStorage.setItem('rc_guest_orders', JSON.stringify(guestOrders));
+  }
+  // open whatsapp
+  window.open(`https://wa.me/${PHONE}?text=${msg}`, '_blank');
+  // clear cart
+  cart = {}; renderCart(); cartPopup.classList.remove('show');
+}
+el('#checkoutBtn').addEventListener('click', cartToWhatsAppAndSave);
+
+/* save item (wishlist) */
+each('.save', btn => {
+  btn.addEventListener('click', ()=> {
+    const name = btn.getAttribute('data-name');
+    const current = localStorage.getItem('rc_current_user');
+    if(!current){ alert('Please register/login to save items (stored locally)'); return; }
+    const users = JSON.parse(localStorage.getItem('rc_users')||'{}');
+    users[current] = users[current] || {saved:[], orders:[]};
+    users[current].saved = users[current].saved || [];
+    if(!users[current].saved.includes(name)) users[current].saved.push(name);
+    localStorage.setItem('rc_users', JSON.stringify(users));
+    alert(name + ' saved to your account.');
+  });
+});
+
+/* show saved quick view in account modal */
+function renderQuickSaved(){
+  const current = localStorage.getItem('rc_current_user');
+  const elq = el('#quickSaved'); elq.innerHTML = '';
+  if(!current){ elq.innerHTML = '<div style="color:var(--muted)">No user logged in.</div>'; return;}
+  const users = JSON.parse(localStorage.getItem('rc_users')||'{}');
+  const saved = (users[current] && users[current].saved) || [];
+  if(saved.length === 0) elq.innerHTML = '<div style="color:var(--muted)">No saved items yet.</div>';
+  saved.forEach(s => { const d = document.createElement('div'); d.textContent = s; elq.appendChild(d); });
+}
+
+/* -------------------------
+  Account system (localStorage)
+---------------------------*/
+function openAccountModal(){ el('#accountModal').classList.add('show'); el('#accountModal').setAttribute('aria-hidden','false'); renderQuickSaved(); }
+function closeAccountModal(){ el('#accountModal').classList.remove('show'); el('#accountModal').setAttribute('aria-hidden','true'); }
+el('#accountBtn').addEventListener('click', openAccountModal);
+el('#closeAccount').addEventListener('click', closeAccountModal);
+
+/* tabs */
+el('#tabLogin').addEventListener('click', ()=> { el('#tabLogin').classList.add('active'); el('#tabRegister').classList.remove('active'); el('#loginPanel').style.display='block'; el('#registerPanel').style.display='none';});
+el('#tabRegister').addEventListener('click', ()=> { el('#tabRegister').classList.add('active'); el('#tabLogin').classList.remove('active'); el('#loginPanel').style.display='none'; el('#registerPanel').style.display='block';});
+
+/* register */
+el('#doRegister').addEventListener('click', ()=> {
+  const name = el('#regName').value.trim();
+  const email = el('#regEmail').value.trim().toLowerCase();
+  const pass = el('#regPass').value;
+  if(!name || !email || !pass){ alert('Please fill all fields'); return; }
+  const users = JSON.parse(localStorage.getItem('rc_users')||'{}');
+  if(users[email]){ alert('An account with that email already exists'); return; }
+  users[email] = {name, email, pass, saved:[], orders:[]};
+  localStorage.setItem('rc_users', JSON.stringify(users));
+  localStorage.setItem('rc_current_user', email);
+  alert('Registered and logged in as ' + name);
+  renderQuickSaved();
+  closeAccountModal();
+});
+
+/* login */
+el('#doLogin').addEventListener('click', ()=> {
+  const email = el('#loginEmail').value.trim().toLowerCase(); const pass = el('#loginPass').value;
+  const users = JSON.parse(localStorage.getItem('rc_users')||'{}');
+  if(!users[email] || users[email].pass !== pass){ alert('Invalid credentials'); return; }
+  localStorage.setItem('rc_current_user', email);
+  alert('Logged in as ' + (users[email].name || email));
+  renderQuickSaved();
+  closeAccountModal();
+});
+
+/* guest */
+el('#guestBtn').addEventListener('click', ()=> { localStorage.removeItem('rc_current_user'); alert('Continuing as guest'); closeAccountModal(); });
+
+/* view orders modal */
+el('#viewOrdersBtn').addEventListener('click', ()=> { showOrdersModal(); closeAccountModal(); });
+el('#viewOrdersBtn').addEventListener('click', ()=> { /* same */ });
+
+function showOrdersModal(){
+  const current = localStorage.getItem('rc_current_user');
+  const target = el('#ordersModal'); const list = el('#ordersList'); list.innerHTML = '';
+  if(!current){ list.innerHTML = '<div style="color:var(--muted)">No account logged in. Guest orders are stored locally under "Guest orders".</div>'; }
+  const users = JSON.parse(localStorage.getItem('rc_users')||'{}');
+  const guest = JSON.parse(localStorage.getItem('rc_guest_orders')||'[]');
+  if(current && users[current] && users[current].orders && users[current].orders.length){
+    users[current].orders.slice().reverse().forEach(o => {
+      const d = document.createElement('div'); d.style.border='1px solid #eee'; d.style.padding='8px'; d.style.marginBottom='8px';
+      d.innerHTML = `<div style="font-weight:700">Order — ${new Date(o.date).toLocaleString()}</div><div>${o.items.map(it=>`${it.qty}× ${it.name} (${currency(it.price)})`).join('<br>')}</div><div style="margin-top:6px"><strong>Total: ${currency(o.total)}</strong></div>`;
+      list.appendChild(d);
+    });
+  } else {
+    list.innerHTML += (guest.length ? guest.slice().reverse().map(o=>`<div style="border:1px solid #eee;padding:8px;margin-bottom:8px"><div style="font-weight:700">${new Date(o.date).toLocaleString()}</div><div>${o.items.map(it=>`${it.qty}× ${it.name} (${currency(it.price)})`).join('<br>')}</div><div style="margin-top:6px"><strong>Total: ${currency(o.total)}</strong></div></div>`).join('') : '<div style="color:var(--muted)">No orders yet.</div>');
+  }
+  target.classList.add('show'); target.setAttribute('aria-hidden','false');
+}
+el('#closeOrders').addEventListener('click', ()=> { el('#ordersModal').classList.remove('show'); el('#ordersModal').setAttribute('aria-hidden','true'); });
+
+/* saved items modal */
+el('#viewSaved').addEventListener('click', showSavedModal);
+el('#viewSavedBtn').addEventListener('click', showSavedModal);
+function showSavedModal(){
+  const current = localStorage.getItem('rc_current_user'); const list = el('#savedList'); list.innerHTML='';
+  if(!current){ list.innerHTML = '<div style="color:var(--muted)">No user logged in.</div>'; el('#savedModal').classList.add('show'); return;}
+  const users = JSON.parse(localStorage.getItem('rc_users')||'{}'); const saved = (users[current] && users[current].saved) || [];
+  if(saved.length === 0) list.innerHTML='<div style="color:var(--muted)">No saved items.</div>';
+  saved.forEach(s => { const d=document.createElement('div'); d.style.border='1px solid #eee'; d.style.padding='8px'; d.style.marginBottom='8px'; d.innerHTML = `<div style="font-weight:700">${s}</div><div style="margin-top:6px"><button class="buy" data-name="${s}">Buy</button> <button class="removeSaved" data-name="${s}">Remove</button></div>`; list.appendChild(d); });
+  el('#savedModal').classList.add('show'); el('#savedModal').setAttribute('aria-hidden','false');
+}
+el('#closeSaved').addEventListener('click', ()=> { el('#savedModal').classList.remove('show'); el('#savedModal').setAttribute('aria-hidden','true'); });
+/* handle removeSaved and buy in saved modal using event delegation */
+el('#savedList').addEventListener('click', e => {
+  const name = e.target.getAttribute('data-name'); if(!name) return;
+  if(e.target.classList.contains('removeSaved')){
+    const current = localStorage.getItem('rc_current_user'); if(!current) return alert('No user');
+    const users = JSON.parse(localStorage.getItem('rc_users')||'{}'); users[current].saved = users[current].saved.filter(x=>x!==name); localStorage.setItem('rc_users', JSON.stringify(users)); showSavedModal();
+  } else if(e.target.classList.contains('buy')){
+    const msg = `Hello Rayjes Collection, I want to order: ${name}`;
+    window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+});
+
+/* quickSaved previously rendered */
+el('#closeAccount').addEventListener('click', ()=> el('#accountModal').classList.remove('show'));
+
+/* -------------------------
+  Search behavior
+---------------------------*/
+el('#search').addEventListener('input', function(){
+  const q = this.value.trim().toLowerCase();
+  document.querySelectorAll('.product').forEach(card=>{
+    const name = (card.getAttribute('data-name')||'').toLowerCase();
+    const text = (card.innerText||'').toLowerCase();
+    card.style.display = (name.includes(q) || text.includes(q) || q==='') ? '' : 'none';
+  });
+});
+
+/* top button */
+const topBtn = el('#topBtn'); window.addEventListener('scroll', ()=> topBtn.style.display = window.scrollY > 200 ? 'flex' : 'none'); topBtn.addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+
+/* auto-hide welcome after 3.5s and focus on Featured */
+setTimeout(()=> { document.getElementById('welcome').style.display = 'none'; window.location.hash = '#featured'; }, 3500);
+
+/* -------------------------
+  Save "remove" for cart popup (delegation to cartPopup)
+---------------------------*/
+cartPopup.addEventListener('click', e => {
+  const act = e.target.getAttribute('data-act'); if(!act) return;
+  const name = decodeURIComponent(e.target.getAttribute('data-name'));
+  if(act === 'inc'){ cart[name].qty += 1; renderCart(); }
+  if(act === 'dec'){ cart[name].qty = Math.max(1, cart[name].qty-1); renderCart(); }
+  if(act === 'remove'){ delete cart[name]; renderCart(); }
+});
+
+/* -------------------------
+  Persist user & guest order notes - helper
+---------------------------*/
+function ensureUsersObj(){ const u = JSON.parse(localStorage.getItem('rc_users')||'{}'); localStorage.setItem('rc_users', JSON.stringify(u)); }
+
+/* -------------------------
+  Initial render
+---------------------------*/
+renderCart();
+ensureUsersObj();
+
+/* Accessibility: close modals on escape */
+document.addEventListener('keydown', (e)=> {
+  if(e.key === 'Escape'){ document.querySelectorAll('.modal.show').forEach(m=> m.classList.remove('show')); cartPopup.classList.remove('show'); }
+});
+</script>
+</body>
+</html>
